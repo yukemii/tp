@@ -78,6 +78,8 @@ to show all six columns.
 Saved window positions are restored when enough of the title bar is on an available screen. Otherwise,
 ShutterLink centers the window on the primary screen and moves its title bar inside that screen's work area,
 even when the saved window is larger than the screen. The saved size is unchanged.
+If the preferences file contains zero, negative, or non-finite window dimensions, ShutterLink restores
+and saves the default window settings on startup. Engagement records are unaffected.
 
 ### Try a client workflow
 

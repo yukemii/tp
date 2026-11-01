@@ -55,6 +55,15 @@ public class GuiSettings implements Serializable {
     }
 
     /**
+     * Returns whether both saved dimensions are finite and strictly positive.
+     * Rejects dimensions that cannot be restored as a usable JavaFX window size.
+     */
+    public boolean hasValidWindowSize() {
+        return Double.isFinite(windowWidth) && windowWidth > 0
+                && Double.isFinite(windowHeight) && windowHeight > 0;
+    }
+
+    /**
      * Returns whether a usable portion of the saved title bar is inside a connected screen's work area.
      * A 160-by-40 area keeps enough of the title bar reachable to move the window.
      */

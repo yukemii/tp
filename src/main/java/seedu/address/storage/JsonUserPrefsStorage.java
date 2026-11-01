@@ -44,6 +44,9 @@ public class JsonUserPrefsStorage {
         if (userPrefs.isPresent() && userPrefs.get().getGuiSettings() == null) {
             throw new DataLoadingException(new IOException("GUI settings must not be null."));
         }
+        if (userPrefs.isPresent() && !userPrefs.get().getGuiSettings().hasValidWindowSize()) {
+            throw new DataLoadingException(new IOException("Window dimensions must be finite and positive."));
+        }
         return userPrefs;
     }
 
