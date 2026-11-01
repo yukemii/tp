@@ -3,6 +3,7 @@
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Scene?>
+<?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tooltip?>
@@ -52,13 +53,28 @@
           <StackPane fx:id="commandBoxPlaceholder" />
         </VBox>
 
-        <VBox spacing="6" styleClass="pane-with-border" VBox.vgrow="NEVER">
-          <padding>
-            <Insets bottom="8" left="12" right="12" top="8" />
-          </padding>
-          <Label styleClass="section-label" text="Feedback" />
-          <StackPane fx:id="resultDisplayPlaceholder" minHeight="80" prefHeight="80" maxHeight="100" />
-        </VBox>
+        <HBox spacing="0" VBox.vgrow="NEVER">
+          <VBox minWidth="0" spacing="6" styleClass="pane-with-border" HBox.hgrow="ALWAYS">
+            <padding>
+              <Insets bottom="8" left="12" right="12" top="8" />
+            </padding>
+            <Label styleClass="section-label" text="Feedback" />
+            <StackPane fx:id="resultDisplayPlaceholder" minHeight="80" prefHeight="80"
+                       maxHeight="100" VBox.vgrow="ALWAYS" />
+          </VBox>
+
+          <HBox alignment="CENTER_LEFT" minWidth="320" prefWidth="340" maxWidth="360" minHeight="130" prefHeight="130" maxHeight="130"
+                styleClass="event-schedule-panel">
+            <PieChart fx:id="eventScheduleChart" minWidth="0" prefWidth="130"
+                      legendVisible="false" title="Event schedule" HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER_LEFT" minWidth="120" prefWidth="140" maxWidth="160"
+                  spacing="4" styleClass="event-schedule-legend">
+              <Label fx:id="pastLegend" style="-fx-text-fill: #64748b" />
+              <Label fx:id="upcomingLegend" style="-fx-text-fill: #38bdf8" />
+              <Label fx:id="laterLegend" style="-fx-text-fill: #a78bfa" />
+            </VBox>
+          </HBox>
+        </HBox>
 
         <VBox fx:id="personList" spacing="8" styleClass="pane-with-border" minWidth="340" prefWidth="340"
               VBox.vgrow="ALWAYS">

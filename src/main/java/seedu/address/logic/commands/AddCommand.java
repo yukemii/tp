@@ -57,7 +57,8 @@ public class AddCommand extends Command {
         requireNonNull(model);
 
         if (model.hasPerson(toAdd)) {
-            throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+            throw new CommandException(MESSAGE_DUPLICATE_PERSON
+                    + Messages.formatExistingEngagement(model.getAddressBook().getPersonList(), toAdd));
         }
 
         model.addPerson(toAdd);

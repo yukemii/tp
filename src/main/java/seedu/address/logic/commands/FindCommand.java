@@ -12,7 +12,7 @@ import seedu.address.model.person.PersonSearchPredicate;
 
 /**
  * Finds and lists contacts whose selected field contains the search value.
- * Matching is case-insensitive.
+ * Matching is case-insensitive; stages match the complete value.
  */
 public class FindCommand extends Command {
 
@@ -20,12 +20,14 @@ public class FindCommand extends Command {
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
             + ": Finds engagements by exactly one field.\n"
-            + "Parameters: n/NAME, p/PHONE, e/EMAIL, or t/EVENT_TYPE\n"
+            + "Parameters: n/NAME, p/PHONE, e/EMAIL, t/EVENT_TYPE, or s/STAGE\n"
+            + "Stage searches require a complete stage name.\n"
             + "Examples:\n"
             + "find n/Alice Pauline\n"
             + "find p/91234567\n"
             + "find e/alice@example.com\n"
-            + "find t/Wedding";
+            + "find t/Wedding\n"
+            + "find s/Booked";
 
     public static final String MESSAGE_NO_MATCHING_CONTACTS = "No matching engagements found.";
 

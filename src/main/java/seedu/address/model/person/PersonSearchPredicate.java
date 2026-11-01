@@ -8,7 +8,7 @@ import seedu.address.commons.util.ToStringBuilder;
 
 /**
  * Tests whether a person's selected field contains the search value.
- * Matching is case-insensitive.
+ * Matching is case-insensitive; stages match the complete value.
  */
 public class PersonSearchPredicate implements Predicate<Person> {
 
@@ -17,7 +17,8 @@ public class PersonSearchPredicate implements Predicate<Person> {
         NAME,
         PHONE,
         EMAIL,
-        EVENT_TYPE
+        EVENT_TYPE,
+        STAGE
     }
 
     private final Field field;
@@ -41,7 +42,12 @@ public class PersonSearchPredicate implements Predicate<Person> {
             case PHONE -> person.getPhone().value;
             case EMAIL -> person.getEmail().value;
             case EVENT_TYPE -> person.getEventType().value;
+            case STAGE -> person.getStage().toString();
         };
+
+        if (field == Field.STAGE) {
+            return actualValue.equalsIgnoreCase(searchValue);
+        }
 
         // Compare regions directly to avoid context-sensitive lowercase conversions changing a substring.
         for (int i = 0; i <= actualValue.length() - searchValue.length(); i++) {

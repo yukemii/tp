@@ -46,6 +46,9 @@ public class HelpWindow extends UiPart<Stage> {
             find t/SEARCH_TEXT
                 Show engagements whose event type contains SEARCH_TEXT.
 
+            find s/STAGE
+                Show engagements at the complete named stage (case-insensitive).
+
             list
                 Show all engagements in insertion order.
 

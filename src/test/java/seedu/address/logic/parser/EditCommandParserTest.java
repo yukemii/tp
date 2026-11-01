@@ -1,6 +1,7 @@
 package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.Messages.MESSAGE_SUPPORTED_PARAMETERS;
 import static seedu.address.logic.Messages.MESSAGE_UNSUPPORTED_PARAMETER;
 import static seedu.address.logic.commands.CommandTestUtil.EMAIL_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.EVENT_DATE_DESC_AMY;
@@ -72,11 +73,11 @@ public class EditCommandParserTest {
     @Test
     public void parse_unsupportedPrefix_failure() {
         // unknown prefix instead of a field
-        assertParseFailure(parser, "1 i/ string", String.format(MESSAGE_UNSUPPORTED_PARAMETER, "i/"));
+        assertParseFailure(parser, "1 i/ string", unsupportedParameterMessage("i/"));
 
         // unknown prefix after a valid field
         assertParseFailure(parser, "1" + NAME_DESC_AMY + " x/abc",
-                String.format(MESSAGE_UNSUPPORTED_PARAMETER, "x/"));
+                unsupportedParameterMessage("x/"));
     }
 
     @Test
@@ -141,5 +142,13 @@ public class EditCommandParserTest {
 
         assertParseFailure(parser, userInput, Messages.getErrorMessageForDuplicatePrefixes(
                 PREFIX_PHONE, PREFIX_EMAIL, PREFIX_EVENT_TYPE, PREFIX_EVENT_DATE, PREFIX_STAGE));
+    }
+
+    /**
+     * Returns the expected error message when {@code prefix} is the first unsupported prefix.
+     */
+    private static String unsupportedParameterMessage(String prefix) {
+        return String.format(MESSAGE_UNSUPPORTED_PARAMETER, prefix) + " "
+                + String.format(MESSAGE_SUPPORTED_PARAMETERS, "n/ p/ e/ t/ d/ s/");
     }
 }

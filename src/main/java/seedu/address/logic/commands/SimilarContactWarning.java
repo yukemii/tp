@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import seedu.address.commons.core.index.Index;
+import seedu.address.logic.Messages;
 import seedu.address.model.person.Person;
 
 /**
@@ -15,7 +16,8 @@ import seedu.address.model.person.Person;
 public class SimilarContactWarning {
 
     public static final int MAX_CONTACTS_LISTED = 3;
-    public static final String MESSAGE_WARNING = "\nWarning: possible typo. Shares details with %1$s."
+    public static final String MESSAGE_WARNING = "\n" + Messages.WARNING_PREFIX
+            + "possible typo. Shares details with %1$s."
             + "\nIf this is a mistake, fix the wrong engagement with edit INDEX or delete INDEX.";
     public static final String MESSAGE_MORE_CONTACTS = " and %1$d more";
 

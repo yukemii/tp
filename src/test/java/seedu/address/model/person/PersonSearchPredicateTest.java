@@ -1,7 +1,10 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Locale;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -132,5 +135,18 @@ public class PersonSearchPredicateTest {
                 "Unknown Person");
 
         assertFalse(predicate.test(person));
+    }
+
+    @Test
+    public void stageMatches_onlyTheCompleteSelectedStage() {
+        for (Stage selected : Stage.values()) {
+            PersonSearchPredicate predicate = new PersonSearchPredicate(
+                    PersonSearchPredicate.Field.STAGE, selected.toString().toLowerCase(Locale.ROOT));
+            for (Stage actual : Stage.values()) {
+                Person engagement = new PersonBuilder(person).withStage(actual.toString()).build();
+                assertEquals(selected == actual, predicate.test(engagement));
+            }
+        }
+        assertFalse(new PersonSearchPredicate(PersonSearchPredicate.Field.STAGE, "Enq").test(person));
     }
 }

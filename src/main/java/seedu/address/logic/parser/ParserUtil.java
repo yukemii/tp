@@ -30,8 +30,9 @@ public class ParserUtil {
 
     /**
      * Throws a {@code ParseException} naming the first prefix in {@code args} that is not one of
-     * {@code supportedPrefixes}. A prefix is a sequence of letters followed by {@code /} at the start of
-     * {@code args} or after a space or tab. Name relation markers such as {@code s/o} are not prefixes.
+     * {@code supportedPrefixes}, followed by the supported prefixes. A prefix is a sequence of letters followed by
+     * {@code /} at the start of {@code args} or after a space or tab. Name relation markers such as {@code s/o}
+     * are not prefixes.
      */
     public static void verifyNoUnsupportedPrefixes(String args, Prefix... supportedPrefixes)
             throws ParseException {
@@ -47,7 +48,11 @@ public class ParserUtil {
                 continue;
             }
             if (!supported.contains(prefix)) {
-                throw new ParseException(String.format(Messages.MESSAGE_UNSUPPORTED_PARAMETER, prefix));
+                String supportedList = Stream.of(supportedPrefixes)
+                        .map(Prefix::getPrefix)
+                        .collect(Collectors.joining(" "));
+                throw new ParseException(String.format(Messages.MESSAGE_UNSUPPORTED_PARAMETER, prefix) + " "
+                        + String.format(Messages.MESSAGE_SUPPORTED_PARAMETERS, supportedList));
             }
         }
     }

@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import seedu.address.logic.parser.FindCommandParser;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
@@ -26,6 +27,24 @@ import seedu.address.testutil.PersonBuilder;
 public class FindCommandTest {
     private Model model = new ModelManager(getTypicalAddressBook(), new UserPrefs());
     private Model expectedModel = new ModelManager(getTypicalAddressBook(), new UserPrefs());
+
+    @Test
+    public void execute_stageSearch_replacesPriorViewAndListRestoresAllRecords() throws Exception {
+        Model stageModel = new ModelManager();
+        Person booked = new PersonBuilder().withName("Booked Client").withStage("Booked").build();
+        Person delivered = new PersonBuilder().withName("Delivered Client").withStage("Delivered").build();
+        stageModel.addPerson(booked);
+        stageModel.addPerson(delivered);
+        stageModel.updateFilteredPersonList(person -> person.equals(delivered));
+        FindCommand command = new FindCommandParser().parse(" s/booked");
+        assertFalse(command.modifiesAddressBook());
+        command.execute(stageModel);
+        assertEquals(List.of(booked), stageModel.getFilteredPersonList());
+        new FindCommandParser().parse(" s/Awaiting Payment").execute(stageModel);
+        assertEquals(List.of(), stageModel.getFilteredPersonList());
+        new ListCommand().execute(stageModel);
+        assertEquals(List.of(booked, delivered), stageModel.getFilteredPersonList());
+    }
 
     @Test
     public void equals() {

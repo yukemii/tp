@@ -54,10 +54,17 @@ The screenshots below use fictional engagements in the current interface. Your r
 | Area | What to use it for |
 | --- | --- |
 | **Command** | Type one command, then press Enter. Accepted commands clear the input; rejected commands retain the text for correction. Press Ctrl+L (Command+L on macOS) from the main window to focus this input without clearing unfinished text. |
-| **Feedback** | Read the command result or error. A possible-typo warning can appear after a successful add or edit. |
+| **Feedback** | Read the command result or error. Results are shown in green, possible-typo warnings after a successful add or edit in amber, and errors in red. The text always states the outcome, so the colours are only a visual aid. |
+| Event schedule | Compare the proportions of past, upcoming and later engagements in the current displayed list. The legend shows each count. |
 | List heading | Check which view is active and how many engagements it contains. |
 | Engagement cards | Read each displayed index, client name, phone, email, event type, event date, and stage. Scroll to see additional cards. Double-click an engagement card, or select it with the keyboard and press Enter, to open its complete details. |
 | **Help** | Open the command reference using the button, `help`, or F1. |
+
+In the event schedule chart, **Upcoming** means an event dated today through the following six calendar dates,
+inclusive. **Past** means before today, while **Later** means seven or more days after today. The chart follows the
+current displayed list, so a `find`, `list`, or `upcoming` command can change its proportions.
+It summarizes the view only; use `upcoming` when you want the engagement list itself filtered and sorted by date.
+The chart recalculates after the displayed list changes or the app restarts; it does not refresh automatically at midnight.
 
 The displayed index is a temporary position, not a permanent client ID. After a search, sort, add, edit, advance, or deletion, check the list again before choosing an index. `edit 1` affects the first engagement currently shown, which may be a different engagement from the first one in the full list.
 
@@ -67,6 +74,10 @@ the Up and Down arrow keys, and press Enter. Inside the dialog, use Tab to focus
 copying, or use **Copy details** to copy all fields to the clipboard. Press Escape to close the dialog. You can also
 widen the main window and use the horizontal scrollbar where available. The overview screenshot uses a wider window
 to show all six columns.
+
+Saved window positions are restored when enough of the title bar is on an available screen. Otherwise,
+ShutterLink centers the window on the primary screen and moves its title bar inside that screen's work area,
+even when the saved window is larger than the screen. The saved size is unchanged.
 
 ### Try a client workflow
 
@@ -198,11 +209,21 @@ Warning: possible typo. Shares details with #1 Avery Tan (same phone and email).
 If this is a mistake, fix the wrong engagement with edit INDEX or delete INDEX.
 ```
 
-Each `#INDEX` refers to the full list shown after the command, and the text in brackets states which details are
-shared. A client with several engagements is listed once, and at most three clients are named before the warning
-summarizes the rest as `and N more`. The add has already succeeded; inspect the numbered records in the warning and correct the mistaken one using `edit` or `delete`. A warning is not a duplicate rejection. For repeat engagements with the same name, phone, and email, a different event type or date is accepted without this client-identity warning.
+The feedback panel is highlighted in amber whenever it contains a warning, so the warning is not mistaken for an
+ordinary success message:
 
-A duplicate is rejected even if the new stage differs. Change the existing engagement's stage using `edit INDEX s/STAGE` instead.
+![Feedback panel highlighted in amber, showing a possible-typo warning after an add.](images/ug-typo-warning.png)
+
+Each `#INDEX` refers to the full list shown after the command, and the text in brackets states which details are
+shared. If a long warning does not fit, scroll the feedback panel. A client with several engagements is listed once,
+and at most three clients are named before the warning summarizes the rest as `and N more`. The add has already
+succeeded; inspect the numbered records in the warning and correct the mistaken one using `edit` or `delete`. A
+warning is not a duplicate rejection. For repeat engagements with the same name, phone, and email, a different event
+type or date is accepted without this client-identity warning.
+
+A duplicate is rejected even if the new stage differs, and the error names the existing engagement, for example
+`Existing engagement: Avery Tan | Wedding | 2026-12-20 | Booked.` Find it and change its stage using
+`edit INDEX s/STAGE` instead.
 
 ### Listing and sorting engagements: `list`
 
@@ -228,7 +249,7 @@ Displayed indexes are recalculated; subsequent edit, advance, and delete command
 Sorting does not change the saved records or their insertion order. Restarting restores insertion order.
 
 Only the `sort/` prefix and the value `date` are supported. Spaces and tabs may separate arguments,
-but the command must occupy one line. Stage filtering is not available in the current version.
+but the command must occupy one line. Use `find s/STAGE` to filter by stage; `list` does not accept a stage filter.
 
 | Invalid input | Feedback |
 | --- | --- |
@@ -306,9 +327,11 @@ Example: `advance 2` advances the second displayed engagement by one stage.
 
 ### Finding engagements: `find`
 
-Find engagements whose selected field contains the search text. Matching is case-insensitive and accepts partial
-values; the search text itself is not required to satisfy that field's add/edit format. Spaces and hyphens in phone
-searches are ignored.
+Search name, phone, email, or event type using case-insensitive partial text. These search values do not need to
+satisfy the field's add/edit format. Spaces and hyphens in phone searches are ignored.
+
+For stages, use `find s/STAGE` with a complete stage name: `Enquiry`, `Booked`, `Shot Completed`,
+`Awaiting Payment`, or `Delivered`. Stage matching ignores capitalization but does not accept partial names.
 
 Format:
 
@@ -317,12 +340,14 @@ find n/SEARCH_TEXT
 find p/SEARCH_TEXT
 find e/SEARCH_TEXT
 find t/SEARCH_TEXT
+find s/STAGE
 ```
 Where:
 * `n/` searches client names.
 * `p/` searches stored phone numbers.
 * `e/` searches email addresses.
 * `t/` searches event types.
+* `s/` matches a complete engagement stage, for example `find s/awaiting payment`.
 
 Examples:
 * `find n/Jonathan` finds `Jonathan Wong` and `Jonathan Tan`.
@@ -334,7 +359,7 @@ Phone numbers are stored without spaces or hyphens, so searching with digits onl
 from all saved engagements and replaces the previous search or sort. The heading becomes `Engagements (N)`; edit,
 advance, and delete use the displayed result indexes. Use `list` to restore every engagement.
 
-The whole search value is matched as a substring: `find n/John Tan` looks for that phrase, rather than separate matches for `John` or `Tan`. `find p/9123` can match several engagements, including repeat clients. Spaces and hyphens are removed from phone searches, so `find p/9123 4567` and `find p/9123-4567` can match a stored `91234567`. With no matches, the list is empty and feedback is `No matching engagements found.`; run `list` to restore your records.
+For name, phone, email, and event type, the whole search value is matched as a substring: `find n/John Tan` looks for that phrase, rather than separate matches for `John` or `Tan`. `find p/9123` can match several engagements, including repeat clients. Spaces and hyphens are removed from phone searches, so `find p/9123 4567` and `find p/9123-4567` can match a stored `91234567`. With no matches, the list is empty and feedback is `No matching engagements found.`; run `list` to restore your records.
 
 | Invalid input | Reason |
 | --- | --- |
@@ -452,8 +477,8 @@ If a previously populated list unexpectedly opens empty after manual editing, us
 **Q**: Why did a command affect a different engagement than expected?<br>
 **A**: Indexes refer to the list currently on screen. Add, edit, and advance return to the full list, which can change indexes. Search again and check the event details before acting on a record.
 
-**Q**: Why can I not filter by stage or add free-text notes?<br>
-**A**: These are not available in the current version. Stages can be displayed, edited, or advanced, and you can search by name, phone, email, or event type.
+**Q**: How can I filter by stage, and can I add free-text notes?<br>
+**A**: Use `find s/STAGE`, for example `find s/Booked`. Free-text notes are not available in the current version.
 
 ## Troubleshooting
 
@@ -465,15 +490,14 @@ If a previously populated list unexpectedly opens empty after manual editing, us
 | A usage message, missing field, or repeated-prefix error | Compare your input with the command summary. Add requires name, phone, email, event type, and event date; edit requires an index and at least one field. |
 | `No engagement at that index in the displayed list.` | The requested row is not in the displayed list. Check its current indexes or run `list`. |
 | A phone, email, date, or stage validation error | Follow [Field formats](#field-formats); phone and email cannot be blank. Enter the date as `YYYY-MM-DD` and stages with their documented spacing. |
-| A duplicate-engagement error | Find the existing event and edit it. Changing only the stage does not create a different engagement. |
+| A duplicate-engagement error | The error names the existing engagement. Find it and edit it. Changing only the stage does not create a different engagement. |
+| `Unsupported parameter: ...` | Use only the prefixes in that command's format, each preceded by a space. For `add`, `edit` and `find`, the error also lists the accepted prefixes. |
 | `No matching engagements found.` | Try a shorter search value, use contiguous digits for phone searches, or run `list` to leave the empty search view. |
 | A save-permission or disk-space error | Follow [Saving the data](#saving-the-data). Do not assume the change was saved merely because the list updated. |
 
 --------------------------------------------------------------------------------------------------------------------
 
 ## Known issues
-
-1. **A window can reopen off-screen after disconnecting a monitor.** Close ShutterLink, move `preferences.json` from the launch folder to a backup location, and restart. This resets window placement without deleting `data/addressbook.json`.
 
 1. **Curly and straight apostrophes are different characters in names.** Names are stored exactly as typed, so
    `O’Connor` (curly apostrophe, often inserted by autocorrect) and `O'Connor` are treated as different clients. If
@@ -491,7 +515,7 @@ Action | Format, Examples
 **Clear** | `clear`
 **Delete** | `delete INDEX`<br> e.g., `delete 3`
 **Edit** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [t/EVENT_TYPE] [d/EVENT_DATE] [s/STAGE]`<br> e.g., `edit 2 n/James Lee s/Booked`
-**Find** | `find n/SEARCH_TEXT`, `find p/SEARCH_TEXT`, `find e/SEARCH_TEXT`, or `find t/SEARCH_TEXT`<br> e.g., `find n/James`
+**Find** | `find n/SEARCH_TEXT`, `find p/SEARCH_TEXT`, `find e/SEARCH_TEXT`, `find t/SEARCH_TEXT`, or `find s/STAGE`<br> e.g., `find n/James` or `find s/Booked`
 **List** | `list` or `list sort/date`
 **Upcoming events** | `upcoming`
 **Help** | `help`

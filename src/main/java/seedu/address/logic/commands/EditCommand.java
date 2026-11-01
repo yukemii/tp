@@ -86,7 +86,8 @@ public class EditCommand extends Command {
         }
 
         if (!personToEdit.isSameEngagement(editedPerson) && model.hasPerson(editedPerson)) {
-            throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+            throw new CommandException(MESSAGE_DUPLICATE_PERSON
+                    + Messages.formatExistingEngagement(model.getAddressBook().getPersonList(), editedPerson));
         }
 
         model.setPerson(personToEdit, editedPerson);

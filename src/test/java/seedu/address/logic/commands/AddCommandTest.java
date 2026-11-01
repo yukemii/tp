@@ -50,8 +50,10 @@ public class AddCommandTest {
         Person validPerson = new PersonBuilder().build();
         AddCommand addCommand = new AddCommand(validPerson);
         ModelStub modelStub = new ModelStubWithPerson(validPerson);
+        String expectedMessage = AddCommand.MESSAGE_DUPLICATE_PERSON
+                + String.format(Messages.MESSAGE_EXISTING_ENGAGEMENT, Messages.formatSummary(validPerson));
 
-        assertThrows(CommandException.class, AddCommand.MESSAGE_DUPLICATE_PERSON, () -> addCommand.execute(modelStub));
+        assertThrows(CommandException.class, expectedMessage, () -> addCommand.execute(modelStub));
     }
 
     @Test
@@ -175,6 +177,13 @@ public class AddCommandTest {
         public boolean hasPerson(Person person) {
             requireNonNull(person);
             return this.person.isSameEngagement(person);
+        }
+
+        @Override
+        public ReadOnlyAddressBook getAddressBook() {
+            AddressBook addressBook = new AddressBook();
+            addressBook.addPerson(person);
+            return addressBook;
         }
     }
 

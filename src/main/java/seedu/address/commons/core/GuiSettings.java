@@ -2,8 +2,11 @@ package seedu.address.commons.core;
 
 import java.awt.Point;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
+import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import seedu.address.commons.util.ToStringBuilder;
 
 /**
@@ -14,6 +17,8 @@ public class GuiSettings implements Serializable {
 
     private static final double DEFAULT_HEIGHT = 600;
     private static final double DEFAULT_WIDTH = 740;
+    private static final int VISIBLE_TITLE_WIDTH = 160;
+    private static final int VISIBLE_TITLE_HEIGHT = 40;
 
     private final double windowWidth;
     private final double windowHeight;
@@ -47,6 +52,28 @@ public class GuiSettings implements Serializable {
 
     public Point getWindowCoordinates() {
         return windowCoordinates != null ? new Point(windowCoordinates) : null;
+    }
+
+    /**
+     * Returns whether a usable portion of the saved title bar is inside a connected screen's work area.
+     * A 160-by-40 area keeps enough of the title bar reachable to move the window.
+     */
+    public boolean hasVisibleWindowTitle(List<Rectangle2D> screens) {
+        return windowCoordinates != null && screens.stream().anyMatch(screen ->
+                screen.contains(windowCoordinates.getX(), windowCoordinates.getY(),
+                        VISIBLE_TITLE_WIDTH, VISIBLE_TITLE_HEIGHT));
+    }
+
+    /**
+     * Returns a centered fallback position clamped to keep the title bar inside {@code screen}.
+     * The saved window size and coordinates are unchanged.
+     */
+    public Point2D getFallbackWindowPosition(Rectangle2D screen) {
+        double x = Math.max(screen.getMinX(), Math.min(screen.getMaxX() - VISIBLE_TITLE_WIDTH,
+                screen.getMinX() + (screen.getWidth() - windowWidth) / 2));
+        double y = Math.max(screen.getMinY(), Math.min(screen.getMaxY() - VISIBLE_TITLE_HEIGHT,
+                screen.getMinY() + (screen.getHeight() - windowHeight) / 2));
+        return new Point2D(x, y);
     }
 
     @Override

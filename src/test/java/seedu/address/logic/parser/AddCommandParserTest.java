@@ -2,6 +2,7 @@ package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.Messages.MESSAGE_MISSING_PARAMETER;
+import static seedu.address.logic.Messages.MESSAGE_SUPPORTED_PARAMETERS;
 import static seedu.address.logic.Messages.MESSAGE_UNSUPPORTED_PARAMETER;
 import static seedu.address.logic.commands.CommandTestUtil.EMAIL_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.EMAIL_DESC_BOB;
@@ -141,15 +142,23 @@ public class AddCommandParserTest {
 
         // unknown prefix after a value
         assertParseFailure(parser, validInput + " x/oops",
-                String.format(MESSAGE_UNSUPPORTED_PARAMETER, "x/"));
+                unsupportedParameterMessage("x/"));
 
         // prefixes are case-sensitive
         assertParseFailure(parser, " N/Bob" + PHONE_DESC_BOB + EMAIL_DESC_BOB + EVENT_TYPE_DESC_BOB
-                + EVENT_DATE_DESC_BOB, String.format(MESSAGE_UNSUPPORTED_PARAMETER, "N/"));
+                + EVENT_DATE_DESC_BOB, unsupportedParameterMessage("N/"));
 
         // reported before a missing required prefix
         assertParseFailure(parser, NAME_DESC_BOB + " a/address",
-                String.format(MESSAGE_UNSUPPORTED_PARAMETER, "a/"));
+                unsupportedParameterMessage("a/"));
+    }
+
+    /**
+     * Returns the expected error message when {@code prefix} is the first unsupported prefix.
+     */
+    private static String unsupportedParameterMessage(String prefix) {
+        return String.format(MESSAGE_UNSUPPORTED_PARAMETER, prefix) + " "
+                + String.format(MESSAGE_SUPPORTED_PARAMETERS, "n/ p/ e/ t/ d/ s/");
     }
 
     @Test

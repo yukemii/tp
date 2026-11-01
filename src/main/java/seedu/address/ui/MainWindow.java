@@ -1,20 +1,28 @@
 package seedu.address.ui;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.logic.Logic;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.person.Person;
 
 /**
  * The Main Window. Provides the basic application layout containing
@@ -25,6 +33,7 @@ public class MainWindow extends UiPart<Stage> {
     private static final KeyCombination FOCUS_COMMAND_SHORTCUT =
             new KeyCodeCombination(KeyCode.L, KeyCombination.SHORTCUT_DOWN);
     private static final String FXML = "MainWindow.fxml";
+    private static final int UPCOMING_WINDOW_DAYS = 6;
 
     private Stage primaryStage;
     private Logic logic;
@@ -38,6 +47,18 @@ public class MainWindow extends UiPart<Stage> {
 
     @FXML
     private StackPane commandBoxPlaceholder;
+
+    @FXML
+    private PieChart eventScheduleChart;
+
+    @FXML
+    private Label pastLegend;
+
+    @FXML
+    private Label upcomingLegend;
+
+    @FXML
+    private Label laterLegend;
 
     @FXML
     private StackPane personListPanelPlaceholder;
@@ -87,9 +108,15 @@ public class MainWindow extends UiPart<Stage> {
      * Fills up all the placeholders of this window.
      */
     void fillInnerParts() {
-        personListPanel = new PersonListPanel(logic.getFilteredPersonList());
+        ObservableList<Person> persons = logic.getFilteredPersonList();
+        personListPanel = new PersonListPanel(persons);
         personListPanel.setHeading(logic.getPersonListHeading());
         personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+
+        eventScheduleChart.setAnimated(false);
+        eventScheduleChart.setLabelsVisible(false);
+        persons.addListener((ListChangeListener<Person>) change -> updateEventScheduleChart(persons));
+        updateEventScheduleChart(persons);
 
         resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
@@ -102,14 +129,48 @@ public class MainWindow extends UiPart<Stage> {
     }
 
     /**
+     * Updates the chart showing when engagements in the current view will take place.
+     */
+    private void updateEventScheduleChart(ObservableList<Person> persons) {
+        LocalDate today = LocalDate.now();
+        LocalDate upcomingEndDate = today.plusDays(UPCOMING_WINDOW_DAYS);
+        int pastCount = 0;
+        int upcomingCount = 0;
+        int laterCount = 0;
+
+        for (Person person : persons) {
+            LocalDate eventDate = person.getEventDate().value;
+            if (eventDate.isBefore(today)) {
+                pastCount++;
+            } else if (!eventDate.isAfter(upcomingEndDate)) {
+                upcomingCount++;
+            } else {
+                laterCount++;
+            }
+        }
+
+        eventScheduleChart.getData().setAll(
+                new PieChart.Data("Past (" + pastCount + ")", pastCount),
+                new PieChart.Data("Upcoming (" + upcomingCount + ")", upcomingCount),
+                new PieChart.Data("Later (" + laterCount + ")", laterCount));
+        pastLegend.setText("Past (" + pastCount + ")");
+        upcomingLegend.setText("Upcoming (" + upcomingCount + ")");
+        laterLegend.setText("Later (" + laterCount + ")");
+    }
+
+    /**
      * Sets the default size based on {@code guiSettings}.
      */
     private void setWindowDefaultSize(GuiSettings guiSettings) {
         primaryStage.setHeight(guiSettings.getWindowHeight());
         primaryStage.setWidth(guiSettings.getWindowWidth());
-        if (guiSettings.getWindowCoordinates() != null) {
+        if (guiSettings.hasVisibleWindowTitle(Screen.getScreens().stream().map(Screen::getVisualBounds).toList())) {
             primaryStage.setX(guiSettings.getWindowCoordinates().getX());
             primaryStage.setY(guiSettings.getWindowCoordinates().getY());
+        } else {
+            Point2D fallback = guiSettings.getFallbackWindowPosition(Screen.getPrimary().getVisualBounds());
+            primaryStage.setX(fallback.getX());
+            primaryStage.setY(fallback.getY());
         }
     }
 
@@ -184,7 +245,7 @@ public class MainWindow extends UiPart<Stage> {
 
             return commandResult;
         } catch (CommandException | ParseException e) {
-            resultDisplay.setFeedbackToUser(e.getMessage());
+            resultDisplay.setErrorToUser(e.getMessage());
             throw e;
         }
     }

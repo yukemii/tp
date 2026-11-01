@@ -1,14 +1,19 @@
 package seedu.address.logic.parser;
 
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static seedu.address.logic.Messages.MESSAGE_SUPPORTED_PARAMETERS;
 import static seedu.address.logic.Messages.MESSAGE_UNSUPPORTED_PARAMETER;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
+import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
 
+import seedu.address.logic.Messages;
 import seedu.address.logic.commands.FindCommand;
 import seedu.address.model.person.PersonSearchPredicate;
+import seedu.address.model.person.Stage;
 
 public class FindCommandParserTest {
 
@@ -18,11 +23,10 @@ public class FindCommandParserTest {
 
     @Test
     public void parse_unsupportedPrefix_throwsParseException() {
-        assertParseFailure(parser, " n/Alice s/Booked", String.format(MESSAGE_UNSUPPORTED_PARAMETER, "s/"));
-        assertParseFailure(parser, " n/Alice d/2026-12-20", String.format(MESSAGE_UNSUPPORTED_PARAMETER, "d/"));
-        assertParseFailure(parser, " n/Alice x/oops", String.format(MESSAGE_UNSUPPORTED_PARAMETER, "x/"));
-        assertParseFailure(parser, " x/oops n/Alice", String.format(MESSAGE_UNSUPPORTED_PARAMETER, "x/"));
-        assertParseFailure(parser, " n/Alice\tx/oops", String.format(MESSAGE_UNSUPPORTED_PARAMETER, "x/"));
+        assertParseFailure(parser, " n/Alice d/2026-12-20", unsupportedParameterMessage("d/"));
+        assertParseFailure(parser, " n/Alice x/oops", unsupportedParameterMessage("x/"));
+        assertParseFailure(parser, " x/oops n/Alice", unsupportedParameterMessage("x/"));
+        assertParseFailure(parser, " n/Alice\tx/oops", unsupportedParameterMessage("x/"));
     }
 
     @Test
@@ -80,17 +84,26 @@ public class FindCommandParserTest {
     @Test
     public void parse_multipleFields_throwsParseException() {
         assertParseFailure(parser, " n/Alice p/91234567", INVALID_FORMAT);
+        assertParseFailure(parser, " n/Alice s/Booked", INVALID_FORMAT);
+        assertParseFailure(parser, " s/Booked t/Wedding", INVALID_FORMAT);
     }
 
     @Test
     public void parse_emptyValue_throwsParseException() {
-        assertParseFailure(parser, "n/", INVALID_FORMAT);
+        for (String prefix : new String[]{"n/", "p/", "e/", "t/", "s/"}) {
+            for (String value : new String[]{"", " ", "\t"}) {
+                assertParseFailure(parser, " " + prefix + value, INVALID_FORMAT);
+            }
+        }
         assertParseFailure(parser, "p/ - ", INVALID_FORMAT);
+        assertParseFailure(parser, " p/---", INVALID_FORMAT);
     }
 
     @Test
     public void parse_duplicateField_throwsParseException() {
         assertParseFailure(parser, "n/Alice n/Bob", INVALID_FORMAT);
+        assertParseFailure(parser, " s/Booked s/Enquiry",
+                Messages.getErrorMessageForDuplicatePrefixes(CliSyntax.PREFIX_STAGE));
     }
 
     @Test
@@ -98,4 +111,27 @@ public class FindCommandParserTest {
         assertParseFailure(parser, "Alice", INVALID_FORMAT);
     }
 
+    @Test
+    public void parse_completeStageNames_caseInsensitiveSuccess() {
+        for (Stage stage : Stage.values()) {
+            String value = stage.toString().toLowerCase(Locale.ROOT);
+            assertParseSuccess(parser, " s/ " + value + " ", new FindCommand(
+                    new PersonSearchPredicate(PersonSearchPredicate.Field.STAGE, stage.toString())));
+        }
+    }
+
+    @Test
+    public void parse_invalidStage_rejectsPartialAndUnknownValues() {
+        for (String value : new String[]{"Book", "Completed", "Unknown", "Booked extra"}) {
+            assertParseFailure(parser, " s/" + value, Stage.MESSAGE_CONSTRAINTS);
+        }
+    }
+
+    /**
+     * Returns the expected error message when {@code prefix} is the first unsupported prefix.
+     */
+    private static String unsupportedParameterMessage(String prefix) {
+        return String.format(MESSAGE_UNSUPPORTED_PARAMETER, prefix) + " "
+                + String.format(MESSAGE_SUPPORTED_PARAMETERS, "n/ p/ e/ t/ s/");
+    }
 }

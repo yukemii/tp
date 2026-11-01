@@ -409,6 +409,7 @@
     -fx-accent: #38bdf8;
     -fx-focus-color: #38bdf8;
     -fx-faint-focus-color: rgba(56, 189, 248, 0.18);
+    -error-colour: #fb7185;
 }
 
 .app-title {
@@ -481,6 +482,38 @@
     -fx-text-fill: #e2e8f0;
 }
 
+.event-schedule-panel {
+    -fx-background-color: #111827;
+    -fx-border-color: #334155;
+    -fx-border-width: 1px;
+    -fx-padding: 4 18 4 8;
+}
+
+.event-schedule-panel .chart-title {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 15px;
+    -fx-padding: 8 0 0 0;
+    -fx-text-fill: #e2e8f0;
+}
+
+.event-schedule-panel .default-color0.chart-pie {
+    -fx-pie-color: #64748b;
+}
+
+.event-schedule-panel .default-color1.chart-pie {
+    -fx-pie-color: #38bdf8;
+}
+
+.event-schedule-panel .default-color2.chart-pie {
+    -fx-pie-color: #a78bfa;
+}
+
+.event-schedule-legend {
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 13px;
+    -fx-padding: 12px;
+}
+
 .contact-column-header {
     -fx-background-color: #152033;
     -fx-background-radius: 4px;
@@ -527,12 +560,25 @@
 }
 
 #commandTextField.error {
-    -fx-border-color: #fb7185;
+    -fx-border-color: -error-colour;
     -fx-text-fill: #fecdd3;
 }
 
 .result-display {
     -fx-text-fill: #a7f3d0;
+}
+
+/* Feedback containing a warning, such as a possible typo after add or edit. */
+.result-display.warning {
+    -fx-text-fill: #fcd34d;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 0 0 0 4;
+}
+
+.result-display.feedback-error {
+    -fx-text-fill: -error-colour;
+    -fx-border-color: -error-colour;
+    -fx-border-width: 0 0 0 4;
 }
 
 #resultDisplay .content {
